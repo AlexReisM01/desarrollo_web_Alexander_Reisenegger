@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Registrar voluntario{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <h1>Crear perfil de voluntario</h1>
+  <p>Complete la información obligatoria. Los datos marcados con <span class="required-mark">*</span> son obligatorios.</p>
+</section>
+
+<form id="volunteerForm" method="post" action="{{ url_for('registrar_voluntario') }}" novalidate class="form-card">
+  <p class="form-help">Recuerde verificar que correo, teléfono y dirección sean válidos.</p>
+
+  {% if success_message %}
+    <div class="form-message success">{{ success_message }}</div>
+    <div class="actions">
+      <a class="button primary" href="{{ url_for('informar_avistamiento') }}?voluntario_id={{ volunteer_id }}">Registrar avistamiento</a>
+      <a class="button secondary" href="{{ url_for('index') }}">Volver al inicio</a>
+    </div>
+  {% endif %}
+
+  {% if not success_message %}
+  <div class="form-grid">
+    <label>
+      <span>Nombre(s) <span class="required-mark">*</span></span>
+      <input type="text" id="nombre" name="nombre" maxlength="60" value="{{ form_data.get('nombre','') }}" />
+      {% if errors.get('nombre') %}<small class="field-error">{{ errors['nombre'] }}</small>{% endif %}
+    </label>
+
+    <label>
+      <span>Apellidos <span class="required-mark">*</span></span>
+      <input type="text" id="apellidos" name="apellidos" maxlength="80" value="{{ form_data.get('apellidos','') }}" />
+      {% if errors.get('apellidos') %}<small class="field-error">{{ errors['apellidos'] }}</small>{% endif %}
+    </label>
+
+    <label>
+      <span>Correo electrónico <span class="required-mark">*</span></span>
+      <input type="email" id="email" name="email" maxlength="100" value="{{ form_data.get('email','') }}" placeholder="nombre@correo.cl" />
+      {% if errors.get('email') %}<small class="field-error">{{ errors['email'] }}</small>{% endif %}
+    </label>
+
+    <label>
+      <span>Teléfono móvil <span class="required-mark">*</span></span>
+      <input type="tel" id="telefono" name="telefono" maxlength="15" value="{{ form_data.get('telefono','') }}" placeholder="+56 9 1234 5678" />
+      {% if errors.get('telefono') %}<small class="field-error">{{ errors['telefono'] }}</small>{% endif %}
+    </label>
+
+    <label>
+      <span>Run o documento de identidad <span class="required-mark">*</span></span>
+      <input type="text" id="documento" name="documento" maxlength="12" value="{{ form_data.get('documento','') }}" placeholder="12.345.678-9" />
+      {% if errors.get('documento') %}<small class="field-error">{{ errors['documento'] }}</small>{% endif %}
+    </label>
+
+    <label>
+      <span>Edad</span>
+      <input type="number" id="edad" name="edad" min="10" max="120" value="{{ form_data.get('edad','') }}" />
+    </label>
+
+    <label>
+      <span>Región <span class="required-mark">*</span></span>
+      <select id="region" name="region">
+        <option value="">Seleccione una región</option>
+        {% for region in regions %}
+          <option value="{{ region.id }}" {% if form_data.get('region')|string == region.id|string %}selected{% endif %}>{{ region.nombre }}</option>
+        {% endfor %}
+      </select>
+      {% if errors.get('region') %}<small class="field-error">{{ errors['region'] }}</small>{% endif %}
+    </label>
+
+    <label>
+      <span>Comuna <span class="required-mark">*</span></span>
+      <select id="comuna" name="comuna">
+        <option value="">Seleccione una comuna</option>
+        {% for region in regions %}
+          {% for comuna in comunas_por_region.get(region.id|string, []) %}
+            <option value="{{ comuna.id }}" data-region-id="{{ region.id }}" {% if form_data.get('comuna')|string == comuna.id|string %}selected{% endif %}>{{ comuna.nombre }}</option>
+          {% endfor %}
+        {% endfor %}
+      </select>
+      {% if errors.get('comuna') %}<small class="field-error">{{ errors['comuna'] }}</small>{% endif %}
+    </label>
+
+    <label class="full-width">
+      <span>Dirección postal</span>
+      <input type="text" id="direccion" name="direccion" maxlength="200" value="{{ form_data.get('direccion','') }}" placeholder="Calle, número, villa o población" />
+      {% if errors.get('direccion') %}<small class="field-error">{{ errors['direccion'] }}</small>{% endif %}
+    </label>
+  </div>
+
+  <div class="actions">
+    <button type="reset" class="button secondary">Limpiar</button>
+    <button type="submit" class="button primary">Guardar voluntario</button>
+  </div>
+  {% endif %}
+
+  <div id="volunteerMessage" class="form-message" aria-live="polite"></div>
+</form>
+
+<script src="{{ url_for('static', filename='js/voluntario.js') }}"></script>
+{% endblock %}

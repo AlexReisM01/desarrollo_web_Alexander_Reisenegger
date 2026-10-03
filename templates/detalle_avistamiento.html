@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle del avistamiento{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <h1>Detalle del avistamiento</h1>
+  <p>Información completa del registro y evidencia adjunta.</p>
+</section>
+
+<section class="panel detail-card">
+  {% if detalle %}
+    {% set avistamiento = detalle.avistamiento %}
+    {% set ave = detalle.ave %}
+    {% set voluntario = detalle.voluntario %}
+    <div class="detail-grid">
+      <div>
+        <p class="eyebrow">Especie</p>
+        <h3>{{ ave.nombre if ave else 'Sin nombre' }}</h3>
+      </div>
+      <div>
+        <p class="eyebrow">Fecha y hora</p>
+        <p>{{ avistamiento.fecha_hora.strftime('%d-%m-%Y %H:%M') }}</p>
+      </div>
+      <div>
+        <p class="eyebrow">Lugar</p>
+        <p>{{ avistamiento.lugar }}</p>
+      </div>
+      <div>
+        <p class="eyebrow">Voluntario</p>
+        <p>{{ voluntario.nombre if voluntario else 'No disponible' }}</p>
+      </div>
+    </div>
+
+    {% if avistamiento.descripcion %}
+      <div class="description-box">
+        <h4>Descripción</h4>
+        <p>{{ avistamiento.descripcion }}</p>
+      </div>
+    {% endif %}
+
+    {% if detalle.archivos %}
+      <div class="media-section">
+        <h4>Evidencia</h4>
+        <div class="media-grid">
+          {% for archivo in detalle.archivos %}
+            {% set filename = archivo.nombre_archivo %}
+            {% set mime = archivo.ruta_archivo.lower() %}
+            {% if '.mp4' in mime or '.mov' in mime or '.avi' in mime or '.webm' in mime %}
+              <video controls preload="metadata">
+                <source src="{{ url_for('uploaded_file', filename=filename) }}" type="video/mp4" />
+                Tu navegador no soporta videos HTML5.
+              </video>
+            {% else %}
+              <img src="{{ url_for('uploaded_file', filename=filename) }}" alt="Evidencia de avistamiento" />
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    {% else %}
+      <p>No se registraron archivos asociados a este avistamiento.</p>
+    {% endif %}
+
+    <div class="actions">
+      <a class="button secondary" href="{{ url_for('listar_avistamientos') }}">Volver al listado</a>
+    </div>
+  {% else %}
+    <p>No existe información para este avistamiento.</p>
+  {% endif %}
+</section>
+{% endblock %}

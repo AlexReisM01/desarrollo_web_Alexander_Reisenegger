@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registro de voluntario</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-row">
+        <div>
+          <p class="eyebrow">Sistema de monitoreo ciudadano</p>
+          <h1>Registro de voluntario(a)</h1>
+        </div>
+        <nav aria-label="Navegación principal" class="main-nav">
+          <a href="index.html">Inicio</a>
+          <a href="registro-voluntario.html" class="active">Voluntarios</a>
+          <a href="nuevo-avistamiento.html">Avistamientos</a>
+          <a href="consulta-avistamientos.html">Consultas</a>
+          <a href="dashboard.html">Indicadores</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container page-content">
+      <section class="page-header">
+        <h2>Crear perfil de voluntario</h2>
+        <p>
+          Complete la información obligatoria para registrar a la persona en el
+          sistema. Los datos marcados con <span class="required-mark">*</span> son obligatorios.
+        </p>
+      </section>
+
+      <form id="volunteerForm" novalidate class="form-card" aria-describedby="volunteerHelp">
+        <p id="volunteerHelp" class="form-help">
+          Recuerde verificar que correo, teléfono y dirección sean válidos.
+        </p>
+
+        <div class="form-grid">
+          <label>
+            <span>Nombre(s) <span class="required-mark">*</span></span>
+            <input type="text" id="nombre" name="nombre" maxlength="60" />
+          </label>
+
+          <label>
+            <span>Apellidos <span class="required-mark">*</span></span>
+            <input type="text" id="apellidos" name="apellidos" maxlength="80" />
+          </label>
+
+          <label>
+            <span>Run o documento de identidad <span class="required-mark">*</span></span>
+            <input type="text" id="documento" name="documento" placeholder="12.345.678-9" maxlength="12" />
+          </label>
+
+          <label>
+            <span>Edad</span>
+            <input type="number" id="edad" name="edad" min="10" max="120" />
+          </label>
+
+          <label>
+            <span>Correo electrónico <span class="required-mark">*</span></span>
+            <input type="email" id="email" name="email" maxlength="100" placeholder="nombre@correo.cl" />
+          </label>
+
+          <label>
+            <span>Teléfono móvil <span class="required-mark">*</span></span>
+            <input type="tel" id="telefono" name="telefono" maxlength="15" placeholder="+56 9 1234 5678" />
+          </label>
+
+          <label>
+            <span>Región <span class="required-mark">*</span></span>
+            <select id="region" name="region">
+              <option value="">Seleccione una región</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Comuna <span class="required-mark">*</span></span>
+            <select id="comuna" name="comuna">
+              <option value="">Primero seleccione región</option>
+            </select>
+          </label>
+
+          <label class="full-width">
+            <span>Dirección postal</span>
+            <input type="text" id="direccion" name="direccion" maxlength="200" placeholder="Calle, número, villa o población" />
+          </label>
+        </div>
+
+        <div class="actions">
+          <button type="reset" class="button secondary">Limpiar</button>
+          <button type="submit" class="button primary">Guardar voluntario</button>
+        </div>
+
+        <div id="volunteerMessage" class="form-message" aria-live="polite"></div>
+      </form>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>Prototipo de gestión de avistamientos • Unión de Ornitólogos de Chile</p>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

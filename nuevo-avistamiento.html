@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nuevo avistamiento</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-row">
+        <div>
+          <p class="eyebrow">Sistema de monitoreo ciudadano</p>
+          <h1>Registro de avistamiento</h1>
+        </div>
+        <nav aria-label="Navegación principal" class="main-nav">
+          <a href="index.html">Inicio</a>
+          <a href="registro-voluntario.html">Voluntarios</a>
+          <a href="nuevo-avistamiento.html" class="active">Avistamientos</a>
+          <a href="consulta-avistamientos.html">Consultas</a>
+          <a href="dashboard.html">Indicadores</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container page-content">
+      <section class="page-header">
+        <h2>Reportar nueva observación</h2>
+        <p>
+          Complete los datos del avistamiento. La evidencia visual es obligatoria para
+          validar la observación.
+        </p>
+      </section>
+
+      <form id="observationForm" novalidate class="form-card" aria-describedby="observationHelp">
+        <p id="observationHelp" class="form-help">
+          Los campos marcados con <span class="required-mark">*</span> son obligatorios.
+        </p>
+
+        <div class="form-grid">
+          <label>
+            <span>Voluntario reportante <span class="required-mark">*</span></span>
+            <select id="voluntario" name="voluntario">
+              <option value="">Seleccione un voluntario</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Tipo de ave <span class="required-mark">*</span></span>
+            <select id="tipoAve" name="tipoAve">
+              <option value="">Seleccione</option>
+              <option value="Pájaro">Pájaro</option>
+              <option value="Ave marina">Ave marina</option>
+              <option value="Rapaz">Rapaz</option>
+              <option value="Ave de humedal">Ave de humedal</option>
+              <option value="Ave costera">Ave costera</option>
+              <option value="Otra">Otra</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Nombre común del ave <span class="required-mark">*</span></span>
+            <input type="text" id="nombreAve" name="nombreAve" maxlength="80" placeholder="Por ejemplo: Huairavo" />
+          </label>
+
+          <label>
+            <span>Nombre científico</span>
+            <input type="text" id="cientificoAve" name="cientificoAve" maxlength="100" placeholder="Opcional" />
+          </label>
+
+          <label>
+            <span>Fecha del avistamiento <span class="required-mark">*</span></span>
+            <input type="date" id="fechaAvistamiento" name="fechaAvistamiento" />
+          </label>
+
+          <label>
+            <span>Hora del avistamiento <span class="required-mark">*</span></span>
+            <input type="time" id="horaAvistamiento" name="horaAvistamiento" />
+          </label>
+
+          <label>
+            <span>Región <span class="required-mark">*</span></span>
+            <select id="regionObservacion" name="regionObservacion">
+              <option value="">Seleccione una región</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Comuna <span class="required-mark">*</span></span>
+            <select id="comunaObservacion" name="comunaObservacion">
+              <option value="">Primero seleccione región</option>
+            </select>
+          </label>
+
+          <label class="full-width">
+            <span>Lugar exacto / sector <span class="required-mark">*</span></span>
+            <input type="text" id="lugar" name="lugar" maxlength="200" placeholder="Parque Nacional, río, humedal, costa o sector preciso" />
+          </label>
+
+          <label class="full-width">
+            <span>Descripción de la observación</span>
+            <textarea id="descripcion" name="descripcion" rows="4" maxlength="500" placeholder="Incluya detalles relevantes: comportamiento, número de aves, condiciones climáticas, etc."></textarea>
+          </label>
+
+          <label class="full-width file-picker">
+            <span>Adjuntar foto o video <span class="required-mark">*</span></span>
+            <input type="file" id="archivo" name="archivo" accept="image/*,video/*" />
+            <small>Se acepta al menos una imagen o un video. El archivo no se guarda en este prototipo.</small>
+          </label>
+        </div>
+
+        <div class="actions">
+          <button type="reset" class="button secondary">Limpiar</button>
+          <button type="submit" class="button primary">Guardar avistamiento</button>
+        </div>
+
+        <div id="observationMessage" class="form-message" aria-live="polite"></div>
+      </form>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>Prototipo de gestión de avistamientos • Unión de Ornitólogos de Chile</p>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

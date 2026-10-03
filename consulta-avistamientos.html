@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Consulta de avistamientos</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-row">
+        <div>
+          <p class="eyebrow">Sistema de monitoreo ciudadano</p>
+          <h1>Consulta de avistamientos</h1>
+        </div>
+        <nav aria-label="Navegación principal" class="main-nav">
+          <a href="index.html">Inicio</a>
+          <a href="registro-voluntario.html">Voluntarios</a>
+          <a href="nuevo-avistamiento.html">Avistamientos</a>
+          <a href="consulta-avistamientos.html" class="active">Consultas</a>
+          <a href="dashboard.html">Indicadores</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container page-content">
+      <section class="page-header">
+        <h2>Listados y filtros</h2>
+        <p>Busque registros por tipo de ave y ordene la información según distintos criterios.</p>
+      </section>
+
+      <section class="panel" aria-label="Filtros de búsqueda">
+        <h2>Filtros de búsqueda</h2>
+        <div class="filters">
+          <label>
+            <span>Tipo de ave</span>
+            <select id="filterType">
+              <option value="all">Todos</option>
+              <option value="Pájaro">Pájaro</option>
+              <option value="Ave marina">Ave marina</option>
+              <option value="Rapaz">Rapaz</option>
+              <option value="Ave de humedal">Ave de humedal</option>
+              <option value="Ave costera">Ave costera</option>
+              <option value="Otra">Otra</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Ordenar por</span>
+            <select id="sortOrder">
+              <option value="fecha-desc">Fecha reciente</option>
+              <option value="fecha-asc">Fecha antigua</option>
+              <option value="lugar-asc">Lugar A-Z</option>
+              <option value="lugar-desc">Lugar Z-A</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Registros por página</span>
+            <select id="pageSize">
+              <option value="5">5</option>
+              <option value="10" selected>10</option>
+              <option value="20">20</option>
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <section class="table-panel">
+        <h2>Resultados</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>Nombre</th>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Lugar</th>
+              <th>Región</th>
+              <th>Voluntario</th>
+            </tr>
+          </thead>
+          <tbody id="observationsTableBody"></tbody>
+        </table>
+
+        <div class="table-footer">
+          <p id="tableSummary">Mostrando 0 registros</p>
+          <div class="pagination" id="pagination" role="navigation" aria-label="Paginación de resultados"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>Prototipo de gestión de avistamientos • Unión de Ornitólogos de Chile</p>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

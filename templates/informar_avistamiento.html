@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}Informar avistamiento{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <h1>Reportar nueva observación</h1>
+  <p>Complete los datos del avistamiento. La evidencia visual es obligatoria para validar la observación.</p>
+</section>
+
+<form id="observationForm" method="post" action="{{ url_for('informar_avistamiento') }}" enctype="multipart/form-data" novalidate class="form-card">
+  <p class="form-help">Los campos marcados con <span class="required-mark">*</span> son obligatorios.</p>
+
+  <div class="form-grid">
+    <label>
+      <span>Voluntario reportante <span class="required-mark">*</span></span>
+      <select id="voluntario" name="voluntario">
+        <option value="">Seleccione un voluntario</option>
+        {% for voluntario in voluntarios %}
+          <option value="{{ voluntario.id }}" {% if form_data.get('voluntario')|string == voluntario.id|string %}selected{% endif %}>{{ voluntario.nombre }}</option>
+        {% endfor %}
+      </select>
+      {% if errors.get('voluntario') %}<small class="field-error">{{ errors['voluntario'] }}</small>{% endif %}
+    </label>
+
+    <label>
+      <span>Tipo de ave <span class="required-mark">*</span></span>
+      <select id="tipoAve" name="tipoAve">
+        <option value="">Seleccione</option>
+        <option value="Pájaro" {% if form_data.get('tipoAve') == 'Pájaro' %}selected{% endif %}>Pájaro</option>
+        <option value="Ave marina" {% if form_data.get('tipoAve') == 'Ave marina' %}selected{% endif %}>Ave marina</option>
+        <option value="Rapaz" {% if form_data.get('tipoAve') == 'Rapaz' %}selected{% endif %}>Rapaz</option>
+        <option value="Ave de humedal" {% if form_data.get('tipoAve') == 'Ave de humedal' %}selected{% endif %}>Ave de humedal</option>
+        <option value="Ave costera" {% if form_data.get('tipoAve') == 'Ave costera' %}selected{% endif %}>Ave costera</option>
+        <option value="Otra" {% if form_data.get('tipoAve') == 'Otra' %}selected{% endif %}>Otra</option>
+      </select>
+      {% if errors.get('tipoAve') %}<small class="field-error">{{ errors['tipoAve'] }}</small>{% endif %}
+    </label>
+
+    <label>
+      <span>Nombre común del ave <span class="required-mark">*</span></span>
+      <input type="text" id="nombreAve" name="nombreAve" maxlength="80" value="{{ form_data.get('nombreAve', '') }}" placeholder="Por ejemplo: Huairavo" />
+      {% if errors.get('nombreAve') %}<small class="field-error">{{ errors['nombreAve'] }}</small>{% endif %}
+    </label>
+
+    <label>
+      <span>Nombre científico</span>
+      <input type="text" id="cientificoAve" name="cientificoAve" maxlength="100" value="{{ form_data.get('cientificoAve', '') }}" placeholder="Opcional" />
+    </label>
+
+    <label>
+      <span>Fecha del avistamiento <span class="required-mark">*</span></span>
+      <input type="date" id="fechaAvistamiento" name="fechaAvistamiento" value="{{ form_data.get('fechaAvistamiento', '') }}" />
+      {% if errors.get('fechaAvistamiento') %}<small class="field-error">{{ errors['fechaAvistamiento'] }}</small>{% endif %}
+    </label>
+
+    <label>
+      <span>Hora del avistamiento <span class="required-mark">*</span></span>
+      <input type="time" id="horaAvistamiento" name="horaAvistamiento" value="{{ form_data.get('horaAvistamiento', '') }}" />
+      {% if errors.get('horaAvistamiento') %}<small class="field-error">{{ errors['horaAvistamiento'] }}</small>{% endif %}
+    </label>
+
+    <label>
+      <span>Región <span class="required-mark">*</span></span>
+      <select id="regionObservacion" name="regionObservacion">
+        <option value="">Seleccione una región</option>
+        {% for region in regions %}
+          <option value="{{ region.id }}" {% if form_data.get('regionObservacion')|string == region.id|string %}selected{% endif %}>{{ region.nombre }}</option>
+        {% endfor %}
+      </select>
+      {% if errors.get('regionObservacion') %}<small class="field-error">{{ errors['regionObservacion'] }}</small>{% endif %}
+    </label>
+
+    <label>
+      <span>Comuna <span class="required-mark">*</span></span>
+      <select id="comunaObservacion" name="comunaObservacion">
+        <option value="">Seleccione una comuna</option>
+        {% for region in regions %}
+          {% for comuna in comunas_por_region.get(region.id|string, []) %}
+            <option value="{{ comuna.id }}" data-region-id="{{ region.id }}" {% if form_data.get('comunaObservacion')|string == comuna.id|string %}selected{% endif %}>{{ comuna.nombre }}</option>
+          {% endfor %}
+        {% endfor %}
+      </select>
+      {% if errors.get('comunaObservacion') %}<small class="field-error">{{ errors['comunaObservacion'] }}</small>{% endif %}
+    </label>
+
+    <label class="full-width">
+      <span>Lugar exacto / sector <span class="required-mark">*</span></span>
+      <input type="text" id="lugar" name="lugar" maxlength="200" value="{{ form_data.get('lugar', '') }}" placeholder="Parque Nacional, río, humedal, costa o sector preciso" />
+      {% if errors.get('lugar') %}<small class="field-error">{{ errors['lugar'] }}</small>{% endif %}
+    </label>
+
+    <label class="full-width">
+      <span>Descripción de la observación</span>
+      <textarea id="descripcion" name="descripcion" rows="4" maxlength="500" placeholder="Incluya detalles relevantes: comportamiento, número de aves, condiciones climáticas, etc.">{{ form_data.get('descripcion', '') }}</textarea>
+      {% if errors.get('descripcion') %}<small class="field-error">{{ errors['descripcion'] }}</small>{% endif %}
+    </label>
+
+    <label class="full-width file-picker">
+      <span>Adjuntar foto o video <span class="required-mark">*</span></span>
+      <input type="file" id="archivo" name="archivo" accept="image/*,video/*" multiple />
+      <small>Se acepta al menos una imagen o un video. Se guardará en la carpeta de uploads del servidor.</small>
+      {% if errors.get('archivo') %}<small class="field-error">{{ errors['archivo'] }}</small>{% endif %}
+    </label>
+  </div>
+
+  <div class="actions">
+    <button type="reset" class="button secondary">Limpiar</button>
+    <button type="submit" class="button primary">Guardar avistamiento</button>
+  </div>
+
+  <div id="observationMessage" class="form-message" aria-live="polite"></div>
+</form>
+
+<script src="{{ url_for('static', filename='js/avistamiento.js') }}"></script>
+{% endblock %}

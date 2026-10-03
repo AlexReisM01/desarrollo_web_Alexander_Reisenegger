@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}Portada | Unión de Ornitólogos{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-card">
+    <p class="eyebrow">Bienvenidos</p>
+    <h1>Unión de Ornitólogos de Chile</h1>
+    <p>
+      Este sistema permite registrar voluntarios, reportar avistamientos de aves y revisar
+      indicadores clave para apoyar la vigilancia de la biodiversidad en nuestro país.
+    </p>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>Últimos 2 avistamientos</h2>
+  {% if ultimos_avistamientos %}
+    <ul class="recent-list">
+      {% for avistamiento in ultimos_avistamientos %}
+      <li>
+        <strong>{{ avistamiento.ave_nombre }}</strong>
+        <span>{{ avistamiento.fecha_hora.strftime('%d-%m-%Y %H:%M') }}</span>
+        <span>{{ avistamiento.lugar }}</span>
+        <span>Registrado por: {{ avistamiento.voluntario_nombre }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No hay avistamientos registrados aún.</p>
+  {% endif %}
+</section>
+{% endblock %}

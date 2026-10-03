@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Indicadores y métricas</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-row">
+        <div>
+          <p class="eyebrow">Sistema de monitoreo ciudadano</p>
+          <h1>Indicadores y métricas</h1>
+        </div>
+        <nav aria-label="Navegación principal" class="main-nav">
+          <a href="index.html">Inicio</a>
+          <a href="registro-voluntario.html">Voluntarios</a>
+          <a href="nuevo-avistamiento.html">Avistamientos</a>
+          <a href="consulta-avistamientos.html">Consultas</a>
+          <a href="dashboard.html" class="active">Indicadores</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container page-content">
+      <section class="page-header">
+        <h2>Resumen operativo</h2>
+        <p>Indicadores clave sobre participación de voluntarios y frecuencia de avistamientos.</p>
+      </section>
+
+      <section class="summary-grid" id="dashboardSummary" aria-label="Resumen operativo">
+        <h2 class="sr-only">Resumen operativo</h2>
+      </section>
+
+      <section class="charts-grid" aria-label="Gráficos de indicadores">
+        <h2 class="sr-only">Gráficos</h2>
+        <article class="panel chart-panel">
+          <h3>Avistamientos por tipo</h3>
+          <div id="barChart" class="bar-chart" role="img" aria-label="Gráfico de barras por tipo de ave"></div>
+        </article>
+
+        <article class="panel chart-panel">
+          <h3>Voluntarios por región</h3>
+          <div id="donutChart" class="donut-chart" role="img" aria-label="Gráfico circular por región"></div>
+        </article>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>Prototipo de gestión de avistamientos • Unión de Ornitólogos de Chile</p>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
