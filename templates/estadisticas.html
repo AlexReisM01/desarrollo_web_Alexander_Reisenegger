@@ -3,8 +3,38 @@
 {% block title %}Estadísticas{% endblock %}
 
 {% block content %}
-<section class="panel">
+<section class="page-header">
   <h1>Estadísticas</h1>
-  <p>Sección de indicadores y métricas para la tarea 2. Aquí se mostrarán gráficos y resúmenes del sistema.</p>
+  <p>Resumen de avistamientos y voluntarios registrados en el sistema.</p>
 </section>
+
+<p id="statisticsMessage" class="form-message" role="status" aria-live="polite"></p>
+
+<section class="chart-grid" aria-label="Gráficos estadísticos">
+  <article class="panel chart-card">
+    <h2>Avistamientos por día</h2>
+    <div class="chart-container">
+      <canvas id="sightingsByDay" role="img" aria-label="Gráfico de líneas de avistamientos por día"></canvas>
+    </div>
+  </article>
+  <article class="panel chart-card">
+    <h2>Avistamientos por tipo de ave</h2>
+    <div class="chart-container">
+      <canvas id="sightingsByType" role="img" aria-label="Gráfico circular de avistamientos por tipo de ave"></canvas>
+    </div>
+  </article>
+  <article class="panel chart-card">
+    <h2>Voluntarios por comuna</h2>
+    <div class="chart-container">
+      <canvas id="volunteersByComuna" role="img" aria-label="Gráfico de barras de voluntarios por comuna"></canvas>
+    </div>
+  </article>
+</section>
+
+<div class="actions">
+  <a class="button secondary" href="{{ url_for('index') }}">Volver a la portada</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/estadisticas.js') }}"></script>
 {% endblock %}

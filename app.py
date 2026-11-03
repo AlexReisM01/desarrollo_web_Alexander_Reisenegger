@@ -5,8 +5,8 @@ import re
 from datetime import datetime
 from pathlib import Path
 
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory
-from sqlalchemy import DateTime, ForeignKey, Integer, String, create_engine, func, select
+from flask import Flask, jsonify, render_template, request, redirect, url_for, send_from_directory
+from sqlalchemy import DateTime, ForeignKey, Integer, String, TIMESTAMP, create_engine, func, select
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
 
 
@@ -48,6 +48,7 @@ class Avistamiento(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     voluntario_id: Mapped[int] = mapped_column(ForeignKey("voluntario.id"), nullable=False)
     ave_id: Mapped[int] = mapped_column(ForeignKey("ave.id"), nullable=False)
+    tipo_ave: Mapped[str] = mapped_column(String(50), nullable=False, default="Otra")
     fecha_hora: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     lugar: Mapped[str] = mapped_column(String(200), nullable=False)
     descripcion: Mapped[str | None] = mapped_column(String(500), nullable=True)
@@ -61,6 +62,15 @@ class Registro(Base):
     avistamiento_id: Mapped[int] = mapped_column(ForeignKey("avistamiento.id"), nullable=False)
 
 
+class Comentario(Base):
+    __tablename__ = "comentario"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    nombre: Mapped[str] = mapped_column(String(80), nullable=False)
+    texto: Mapped[str] = mapped_column(String(300), nullable=False)
+    fecha: Mapped[datetime] = mapped_column(TIMESTAMP, nullable=False)
+    avistamiento_id: Mapped[int] = mapped_column(ForeignKey("avistamiento.id"), nullable=False)
+
+
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+mysqlconnector://cc5002:programacionweb@localhost:3306/tarea2?charset=utf8mb4"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -69,6 +79,8 @@ app.config["UPLOAD_FOLDER"] = os.path.join(os.path.dirname(__file__), "uploads")
 engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"])
 
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+
+TIPOS_AVE = ("Pájaro", "Ave marina", "Rapaz", "Ave de humedal", "Ave costera", "Otra")
 
 
 def obtener_voluntarios():
@@ -140,12 +152,16 @@ def validar_voluntario(form_data):
 
     if not region_id:
         errors["region"] = "Debe seleccionar una región."
+    elif not re.fullmatch(r"\d+", region_id):
+        errors["region"] = "Identificador de región inválido."
     if not comuna_id:
         errors["comuna"] = "Debe seleccionar una comuna."
+    elif not re.fullmatch(r"\d+", comuna_id):
+        errors["comuna"] = "Identificador de comuna inválido."
     if direccion and len(direccion) > 200:
         errors["direccion"] = "La dirección no puede exceder los 200 caracteres."
 
-    if region_id and comuna_id:
+    if re.fullmatch(r"\d+", region_id) and re.fullmatch(r"\d+", comuna_id):
         with Session(engine) as session:
             comuna = session.get(Comuna, int(comuna_id))
             if not comuna or str(comuna.region_id) != region_id:
@@ -175,6 +191,8 @@ def validar_avistamiento(form_data, files):
 
     if not tipo_ave:
         errors["tipoAve"] = "Debe seleccionar el tipo de ave."
+    elif tipo_ave not in TIPOS_AVE:
+        errors["tipoAve"] = "El tipo de ave seleccionado no es válido."
 
     if not nombre_ave:
         errors["nombreAve"] = "Debe indicar el nombre del ave."
@@ -193,11 +211,20 @@ def validar_avistamiento(form_data, files):
 
     if not hora:
         errors["horaAvistamiento"] = "La hora del avistamiento es obligatoria."
+    else:
+        try:
+            datetime.strptime(hora, "%H:%M")
+        except ValueError:
+            errors["horaAvistamiento"] = "La hora debe tener formato válido."
 
     if not region_id:
         errors["regionObservacion"] = "Debe seleccionar una región."
+    elif not re.fullmatch(r"\d+", region_id):
+        errors["regionObservacion"] = "Identificador de región inválido."
     if not comuna_id:
         errors["comunaObservacion"] = "Debe seleccionar una comuna."
+    elif not re.fullmatch(r"\d+", comuna_id):
+        errors["comunaObservacion"] = "Identificador de comuna inválido."
 
     if not lugar:
         errors["lugar"] = "El lugar del avistamiento es obligatorio."
@@ -218,11 +245,19 @@ def validar_avistamiento(form_data, files):
                 errors["archivo"] = "Solo se permiten archivos de imagen o video."
                 break
 
-    if region_id and comuna_id:
+    voluntario_id_valido = bool(voluntario_id and re.fullmatch(r"\d+", voluntario_id))
+    ubicacion_valida = bool(
+        re.fullmatch(r"\d+", region_id) and re.fullmatch(r"\d+", comuna_id)
+    )
+    if voluntario_id_valido or ubicacion_valida:
         with Session(engine) as session:
-            comuna = session.get(Comuna, int(comuna_id))
-            if not comuna or str(comuna.region_id) != region_id:
-                errors["comunaObservacion"] = "La comuna seleccionada no corresponde a la región elegida."
+            if voluntario_id_valido:
+                if session.get(Voluntario, int(voluntario_id)) is None:
+                    errors["voluntario"] = "El voluntario seleccionado no existe."
+            if ubicacion_valida:
+                comuna = session.get(Comuna, int(comuna_id))
+                if not comuna or str(comuna.region_id) != region_id:
+                    errors["comunaObservacion"] = "La comuna seleccionada no corresponde a la región elegida."
 
     return errors
 
@@ -335,6 +370,7 @@ def informar_avistamiento():
             avistamiento = Avistamiento(
                 voluntario_id=voluntario_id,
                 ave_id=ave.id,
+                tipo_ave=tipo_ave,
                 fecha_hora=fecha_hora,
                 lugar=(form_data.get("lugar") or "").strip(),
                 descripcion=descripcion,
@@ -382,9 +418,48 @@ def estadisticas():
     return render_template("estadisticas.html")
 
 
+@app.route("/api/estadisticas")
+def api_estadisticas():
+    with Session(engine) as session:
+        avistamientos_por_dia = session.execute(
+            select(func.date(Avistamiento.fecha_hora), func.count(Avistamiento.id))
+            .group_by(func.date(Avistamiento.fecha_hora))
+            .order_by(func.date(Avistamiento.fecha_hora))
+        ).all()
+        avistamientos_por_tipo = session.execute(
+            select(Avistamiento.tipo_ave, func.count(Avistamiento.id))
+            .group_by(Avistamiento.tipo_ave)
+            .order_by(Avistamiento.tipo_ave)
+        ).all()
+        voluntarios_por_comuna = session.execute(
+            select(Comuna.nombre, func.count(Voluntario.id))
+            .join(Voluntario, Voluntario.comuna_id == Comuna.id)
+            .group_by(Comuna.id, Comuna.nombre)
+            .order_by(Comuna.nombre)
+        ).all()
+
+    return jsonify({
+        "avistamientos_por_dia": [
+            {"fecha": fecha.isoformat(), "total": total}
+            for fecha, total in avistamientos_por_dia
+        ],
+        "avistamientos_por_tipo": [
+            {"tipo": tipo, "total": total}
+            for tipo, total in avistamientos_por_tipo
+        ],
+        "voluntarios_por_comuna": [
+            {"comuna": comuna, "total": total}
+            for comuna, total in voluntarios_por_comuna
+        ],
+    })
+
+
 @app.route("/listar_avistamientos")
 def listar_avistamientos():
-    page = max(1, int(request.args.get("page", 1)))
+    try:
+        page = max(1, int(request.args.get("page", 1)))
+    except (TypeError, ValueError):
+        page = 1
     per_page = 10
     resultados, total = obtener_listado_avistamientos(page=page, per_page=per_page)
     total_pages = max(1, (total + per_page - 1) // per_page) if total else 1
@@ -407,6 +482,64 @@ def detalle_avistamiento(avistamiento_id):
     return render_template("detalle_avistamiento.html", detalle=detalle)
 
 
+@app.route("/api/avistamientos/<int:avistamiento_id>/comentarios", methods=["GET", "POST"])
+def api_comentarios(avistamiento_id):
+    with Session(engine) as session:
+        if session.get(Avistamiento, avistamiento_id) is None:
+            return jsonify({"error": "No existe el avistamiento solicitado."}), 404
+
+        if request.method == "GET":
+            comentarios = session.execute(
+                select(Comentario)
+                .where(Comentario.avistamiento_id == avistamiento_id)
+                .order_by(Comentario.fecha.desc(), Comentario.id.desc())
+            ).scalars().all()
+            return jsonify([
+                {
+                    "id": comentario.id,
+                    "nombre": comentario.nombre,
+                    "texto": comentario.texto,
+                    "fecha": comentario.fecha.strftime("%d-%m-%Y %H:%M"),
+                }
+                for comentario in comentarios
+            ])
+
+        data = request.get_json(silent=True)
+        if data is None:
+            data = request.form.to_dict()
+        if not isinstance(data, dict):
+            return jsonify({"errors": {"form": "El cuerpo de la solicitud debe ser un objeto JSON."}}), 400
+        nombre_original = data.get("nombre")
+        texto_original = data.get("texto")
+        nombre = nombre_original.strip() if isinstance(nombre_original, str) else ""
+        texto = texto_original.strip() if isinstance(texto_original, str) else ""
+        errors = {}
+
+        if len(nombre) < 3 or len(nombre) > 50:
+            errors["nombre"] = "El nombre debe tener entre 3 y 50 caracteres."
+        if len(texto) < 5 or len(texto) > 300:
+            errors["texto"] = "El comentario debe tener entre 5 y 300 caracteres."
+        if errors:
+            return jsonify({"errors": errors}), 400
+
+        comentario = Comentario(
+            nombre=nombre,
+            texto=texto,
+            fecha=datetime.now(),
+            avistamiento_id=avistamiento_id,
+        )
+        session.add(comentario)
+        session.commit()
+        resultado = {
+            "id": comentario.id,
+            "nombre": comentario.nombre,
+            "texto": comentario.texto,
+            "fecha": comentario.fecha.strftime("%d-%m-%Y %H:%M"),
+        }
+
+    return jsonify(resultado), 201
+
+
 @app.route("/uploads/<path:filename>")
 def uploaded_file(filename):
     return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
@@ -415,7 +548,12 @@ def uploaded_file(filename):
 def obtener_listado_avistamientos(page=1, per_page=10):
     with Session(engine) as session:
         stmt = (
-            select(Avistamiento, Ave.nombre.label("ave_nombre"), Voluntario.nombre.label("voluntario_nombre"))
+            select(
+                Avistamiento,
+                Avistamiento.tipo_ave.label("tipo_ave"),
+                Ave.nombre.label("ave_nombre"),
+                Voluntario.nombre.label("voluntario_nombre"),
+            )
             .join(Ave, Ave.id == Avistamiento.ave_id)
             .join(Voluntario, Voluntario.id == Avistamiento.voluntario_id)
             .order_by(Avistamiento.fecha_hora.desc())

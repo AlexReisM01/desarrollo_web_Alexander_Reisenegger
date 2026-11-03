@@ -1,56 +1,25 @@
-# Tarea 1 - Sistema de avistamientos de aves
+# Sistema de avistamientos de aves
 
-Este prototipo fue desarrollado como una interfaz estática en HTML5, CSS3 y JavaScript, sin uso de servidor web ni persistencia de datos, con el objetivo de validar la navegación, los formularios y las reglas de validación del sistema propuesto.
+Aplicación web Flask para registrar voluntarios y avistamientos, consultar sus detalles y visualizar estadísticas de la base de datos.
 
-## Decisiones de diseño
+## Preparación de la base de datos
 
-- Se implementaron 5 páginas principales:
-  - Inicio
-  - Registro de voluntario
-  - Registro de avistamiento
-  - Consulta de avistamientos
-  - Indicadores y métricas
-- Se usaron etiquetas semánticas como `header`, `main`, `section`, `nav`, `form`, `table` y `footer` para mejorar la legibilidad del código y la accesibilidad.
-- La validación se realiza completamente con JavaScript para cumplir con la exigencia de no depender de `required` como validación principal.
-- Los formularios incluyen mensajes claros de error y éxito en pantalla.
-- La estructura es responsive y funciona en distintas resoluciones mediante media queries.
+1. Para una instalación nueva, cree la base de datos y cargue los datos de Tarea 2 según los scripts del proyecto. Si ya existe la base de datos de Tarea 2, no vuelva a ejecutar `tarea2.sql`, ya que elimina y recrea el esquema.
+2. Ejecute `tabla-comentario.sql` para crear la tabla de comentarios.
+3. Ejecute `migracion-tarea3.sql` una vez sobre la base de datos existente. Agrega la categoría del ave a cada avistamiento sin reemplazar los registros; los avistamientos antiguos reciben la categoría `Otra`.
+4. Configure las credenciales de conexión de MySQL en `app.py` para su entorno local.
 
-## Validaciones implementadas
+La aplicación se conecta a MySQL usando Flask, SQLAlchemy y `mysql-connector-python`. Instale esas dependencias en su entorno Python y ejecute `python app.py`.
 
-### Registro de voluntario
-- Nombre y apellidos obligatorios.
-- RUN con formato válido.
-- Correo electrónico con formato válido.
-- Teléfono móvil con formato válido.
-- Región y comuna obligatorias.
-- Se valida la presencia de datos requeridos y la estructura del contenido.
+## Datos de prueba
 
-### Registro de avistamiento
-- Voluntario reportante obligatorio.
-- Tipo de ave, nombre, fecha, hora, región, comuna y lugar obligatorios.
-- Se exige al menos un archivo de imagen o video.
-- La fecha no puede estar en el futuro y debe corresponder a los últimos 5 años.
-- Se validan los campos obligatorios y la consistencia temporal.
+La base de datos local usada durante el desarrollo contiene datos ficticios para probar las funcionalidades de Tarea 3: 3 voluntarios, 6 avistamientos y 6 comentarios. Los voluntarios y lugares de prueba están identificados con `PRUEBA TAREA3`; los comentarios aparecen como `Comentarista prueba`. Estos registros se agregaron sin borrar los datos que ya existían.
 
-### Consulta de avistamientos
-- Filtros por tipo de ave.
-- Ordenamiento por fecha y lugar.
-- Paginación con resultados por página.
-- Tabla dinámica simulando registros del sistema.
+Los datos se insertaron directamente en la base local y no forman parte de los scripts SQL de carga del repositorio. No se volverán a crear automáticamente al iniciar la aplicación.
 
-### Indicadores
-- Resumen con métricas clave.
-- Gráfico de barras por tipo de ave.
-- Gráfico circular por región de voluntarios.
+## Decisiones de implementación
 
-## Cómo abrir el prototipo
-
-Puedes abrir directamente cualquiera de los archivos `.html` en el navegador, por ejemplo:
-
-- `index.html`
-
-No es necesario iniciar un servidor ni instalar dependencias.
-
-## Nota
-
-Este es un prototipo de interfaz, por lo que los datos ingresados no se almacenan ni se persisten entre sesiones.
+- Los comentarios se consultan y agregan de forma asíncrona con `fetch`. La validación se ejecuta en el navegador y nuevamente en Flask; el nombre permite entre 3 y 50 caracteres y el texto entre 5 y 300 caracteres.
+- La categoría elegida al registrar un avistamiento se persiste en `avistamiento.tipo_ave`. Por ello, el gráfico circular cuenta los avistamientos por categoría (Pájaro, Ave marina, Rapaz, Ave de humedal, Ave costera y Otra), en lugar de agrupar por especie.
+- La API `/api/estadisticas` obtiene desde MySQL los avistamientos por día, avistamientos por categoría y voluntarios por comuna. Los tres gráficos se dibujan en el navegador con Chart.js 4, biblioteca JavaScript de licencia MIT servida desde jsDelivr.
+- El contenido de los comentarios se agrega al DOM como texto, no como HTML, para que entradas con marcado no se ejecuten.

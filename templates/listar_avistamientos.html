@@ -25,10 +25,11 @@
         {% if avistamientos %}
           {% for row in avistamientos %}
             {% set avistamiento = row[0] %}
-            {% set ave_nombre = row[1] %}
-            {% set voluntario_nombre = row[2] %}
+            {% set tipo_ave = row[1] %}
+            {% set ave_nombre = row[2] %}
+            {% set voluntario_nombre = row[3] %}
             <tr class="clickable-row" data-id="{{ avistamiento.id }}" tabindex="0" role="button" aria-label="Ver detalle del avistamiento {{ avistamiento.id }}">
-              <td>{{ ave_nombre }}</td>
+              <td>{{ tipo_ave }}</td>
               <td>{{ ave_nombre }}</td>
               <td>{{ avistamiento.fecha_hora.strftime('%d-%m-%Y %H:%M') }}</td>
               <td>{{ avistamiento.lugar }}</td>

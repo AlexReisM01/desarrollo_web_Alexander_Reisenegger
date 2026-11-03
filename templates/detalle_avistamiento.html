@@ -19,6 +19,10 @@
         <h3>{{ ave.nombre if ave else 'Sin nombre' }}</h3>
       </div>
       <div>
+        <p class="eyebrow">Tipo de ave</p>
+        <p>{{ avistamiento.tipo_ave }}</p>
+      </div>
+      <div>
         <p class="eyebrow">Fecha y hora</p>
         <p>{{ avistamiento.fecha_hora.strftime('%d-%m-%Y %H:%M') }}</p>
       </div>
@@ -61,6 +65,32 @@
       <p>No se registraron archivos asociados a este avistamiento.</p>
     {% endif %}
 
+    <section class="comments-section" aria-labelledby="commentsHeading">
+      <h2 id="commentsHeading">Comentarios</h2>
+      <p id="commentsMessage" class="form-message" role="status" aria-live="polite">Cargando comentarios…</p>
+      <ul
+        id="commentsList"
+        class="comment-list"
+        data-url="{{ url_for('api_comentarios', avistamiento_id=avistamiento.id) }}"
+        aria-live="polite"
+      ></ul>
+
+      <h3>Agregar un comentario</h3>
+      <form id="commentForm" class="form-card" novalidate>
+        <label for="commentName">
+          Nombre del comentarista <span class="required-mark">*</span>
+          <input id="commentName" name="nombre" type="text" minlength="3" maxlength="50" required />
+        </label>
+        <label for="commentText">
+          Comentario <span class="required-mark">*</span>
+          <textarea id="commentText" name="texto" rows="3" cols="40" minlength="5" maxlength="300" required></textarea>
+        </label>
+        <div class="actions">
+          <button id="commentSubmit" type="submit" class="button primary">Agregar comentario</button>
+        </div>
+      </form>
+    </section>
+
     <div class="actions">
       <a class="button secondary" href="{{ url_for('listar_avistamientos') }}">Volver al listado</a>
     </div>
@@ -68,4 +98,7 @@
     <p>No existe información para este avistamiento.</p>
   {% endif %}
 </section>
+{% if detalle %}
+<script src="{{ url_for('static', filename='js/comentarios.js') }}"></script>
+{% endif %}
 {% endblock %}
