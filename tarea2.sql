@@ -3,6 +3,8 @@
 -- Model: New Model    Version: 1.0
 -- MySQL Workbench Forward Engineering
 
+SET NAMES utf8mb4;
+
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
@@ -15,7 +17,7 @@ DROP SCHEMA IF EXISTS `tarea2` ;
 -- -----------------------------------------------------
 -- Schema tarea2
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `tarea2` DEFAULT CHARACTER SET utf8 ;
+CREATE SCHEMA IF NOT EXISTS `tarea2` DEFAULT CHARACTER SET utf8mb4 ;
 USE `tarea2` ;
 
 -- -----------------------------------------------------
