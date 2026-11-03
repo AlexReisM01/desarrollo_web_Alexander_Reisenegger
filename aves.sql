@@ -1,3 +1,5 @@
+SET NAMES utf8mb4;
+
 INSERT INTO ave (nombre) values ("Aguila");
 INSERT INTO ave (nombre) values ("Aguila pescadora");
 INSERT INTO ave (nombre) values ("Aguilucho");
