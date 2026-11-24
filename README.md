@@ -1,21 +1,23 @@
 # Sistema de avistamientos de aves
 
-Aplicación web Flask para registrar voluntarios y avistamientos, consultar sus detalles y visualizar estadísticas de la base de datos.
+Aplicación web para registrar voluntarios y avistamientos, consultar detalles y visualizar estadísticas.
 
-## Preparación de la base de datos
+## Aplicación anterior (Flask)
 
-1. Para una instalación nueva, cree la base de datos y cargue los datos de Tarea 2 según los scripts del proyecto. Si ya existe la base de datos de Tarea 2, no vuelva a ejecutar `tarea2.sql`, ya que elimina y recrea el esquema.
-2. Ejecute `tabla-comentario.sql` para crear la tabla de comentarios.
-3. Ejecute `migracion-tarea3.sql` una vez sobre la base de datos existente. Agrega la categoría del ave a cada avistamiento sin reemplazar los registros; los avistamientos antiguos reciben la categoría `Otra`.
-4. Configure las credenciales de conexión de MySQL en `app.py` para su entorno local.
+La aplicación original continúa disponible con Flask, SQLAlchemy y MySQL Connector. Instale las dependencias Python del entorno y ejecute `python app.py`.
 
-La aplicación se conecta a MySQL usando Flask, SQLAlchemy y `mysql-connector-python`. Instale esas dependencias en su entorno Python y ejecute `python app.py`.
+## Buscador y evaluación (Spring Boot)
 
-## Datos de prueba
+El módulo `springboot/` implementa el buscador asíncrono y la evaluación de avistamientos con Java 17+, Spring Boot, Spring Data JPA y MySQL.
 
-La base de datos local usada durante el desarrollo contiene datos ficticios para probar las funcionalidades de Tarea 3: 3 voluntarios, 6 avistamientos y 6 comentarios. Los voluntarios y lugares de prueba están identificados con `PRUEBA TAREA3`; los comentarios aparecen como `Comentarista prueba`. Estos registros se agregaron sin borrar los datos que ya existían.
+1. Cree/cargue el esquema `tarea2` según los scripts del proyecto. No vuelva a ejecutar `tarea2.sql` sobre una base de datos existente, porque elimina y recrea el esquema.
+2. Ejecute `tabla-comentario.sql` y `migracion-tarea3.sql` si aún no lo ha hecho.
+3. Ejecute `tabla-nota.sql` para crear la tabla de evaluaciones.
+4. Configure `DB_URL`, `DB_USERNAME` y `DB_PASSWORD` (por defecto, la conexión local `tarea2` con el usuario `cc5002`).
+5. Desde `springboot/`, ejecute `mvn spring-boot:run` y abra `http://localhost:8080`.
 
-Los datos se insertaron directamente en la base local y no forman parte de los scripts SQL de carga del repositorio. No se volverán a crear automáticamente al iniciar la aplicación.
+La página realiza las búsquedas y envía las evaluaciones con `fetch`. La nota mostrada es el promedio de las evaluaciones guardadas; las evaluaciones aceptadas son enteros entre 1 y 7, validados tanto en Spring Boot como en el cliente.
+
 
 ## Decisiones de implementación
 
